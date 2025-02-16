@@ -98,16 +98,42 @@ MLP Classifier
 - Best configuration achieved 93.28% accuracy
 
 ### Hybrid Model Performance
-![Alt Text](./assets/cnfusion.png)
+![Alt Text](./assets/cnn_confusion.png)
 - Feature extraction analysis
 - Final test accuracy: 93.37%
 - Detailed performance metrics
 
 ## Usage
-```python
-# For MLP training
+
+There are two ways to run this project:
+
+### 1. Complete Hyperparameter Search
+This will run all combinations of hyperparameters and compare their performances.
+
+Using Python files:
+```bash
+# For MLP training with all hyperparameter combinations
 python3 MLP_from_scratch.py
 
-# For CNN and feature extraction
+# For CNN and feature extraction with all hyperparameter combinations
 python3 CNN_feature_extraction.py
 ```
+
+Using Jupyter Notebooks:
+```bash
+# Run all cells in:
+MLP_from_scratch.ipynb
+CNN_feature_extraction.ipynb
+```
+
+### 2. Best Model Configuration Only
+This will run only the best performing configurations we found.
+
+Using Jupyter Notebooks:
+1. Open `MLP_from_scratch.ipynb`
+   - Run all cells EXCEPT the section "Trying Various Hyperparameter combinations"
+   - This will train the MLP with the optimal configuration
+
+2. Open `CNN_feature_extraction.ipynb`
+   - Run all cells EXCEPT the section "Trying Various Hyperparameter combinations"
+   - This will train the CNN and perform feature extraction with the optimal configuration

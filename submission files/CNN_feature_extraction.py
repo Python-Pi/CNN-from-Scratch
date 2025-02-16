@@ -123,6 +123,8 @@ class CNNModel(nn.Module):
             self.pooling = nn.MaxPool2d(kernel_size=2)
         elif pooling == 'avg':
             self.pooling = nn.AvgPool2d(kernel_size=2)
+        elif pooling == 'global_avg':
+            self.pooling = nn.AdaptiveAvgPool2d((1, 1))  # Global average pooling
         elif pooling == 'none':
             self.pooling = nn.Identity()
         else:
@@ -181,14 +183,18 @@ class CNNModel(nn.Module):
         shapes = []
         for i in range(5):
             x = self.conv_layers[i](x)
-            # print(f"Layer {i} shape after conv: {x.shape}")
             if self.use_batchnorm and x.size(-1) > 1 and x.size(-2) > 1:
                 x = self.batchnorms[i](x)
             x = self.activation(x)
             if i < 4:
-                x = self.pooling(x)
-                shapes.append(x.shape)
-                # print(f"Layer {i} shape after pooling: {x.shape}")
+                # For global_avg pooling, only apply at the end
+                if self.pooling.__class__.__name__ != 'AdaptiveAvgPool2d':
+                    x = self.pooling(x)
+                    shapes.append(x.shape)
+
+        # Apply global average pooling at the end if selected
+        if self.pooling.__class__.__name__ == 'AdaptiveAvgPool2d':
+            x = self.pooling(x)
 
         x = x.flatten(start_dim=1)
         x = self.fc1(x)
@@ -202,7 +208,7 @@ class CNNModel(nn.Module):
 # ### training code
 
 # %%
-def train_and_evaluate(model, train_loader, val_loader, epochs=10, device='cuda'):
+def train_and_evaluate(model, train_loader, val_loader, epochs=1, device='cuda'):
     criterion = nn.CrossEntropyLoss()
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
